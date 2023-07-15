@@ -1,0 +1,13 @@
+" Import .vimrc
+source ~/.vimrc
+
+""" Extensions -------------------------
+set NERDTree
+let g:NERDTreeMapActiveNode = 'l'
+let g:NERDTreeMapJumpParent = 'h'
+
+""" Mappings ---------------------------
+map <leader>e :NERDTree<CR>
+map <leader>t <Action>(ActivateTerminalToolWindow)
+map <leader><leader> <Action>(GotoAction)
+map <leader><Tab> <Action>(Switcher)
