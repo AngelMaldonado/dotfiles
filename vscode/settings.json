@@ -1,4 +1,5 @@
 {
     "workbench.colorTheme": "Visual Studio Dark",
-    "terminal.integrated.fontFamily": "FiraCode Nerd Font Mono"
+    "terminal.integrated.fontFamily": "FiraCode Nerd Font Mono",
+    "workbench.iconTheme": "material-icon-theme"
 }
