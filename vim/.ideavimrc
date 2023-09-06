@@ -11,3 +11,7 @@ map <leader>e :NERDTree<CR>
 map <leader>t <Action>(ActivateTerminalToolWindow)
 map <leader><leader> <Action>(GotoAction)
 map <leader><Tab> <Action>(Switcher)
+map <leader>. <Action>(ShowIntentionActions)
+map <leader>d <Action>(QuickJavaDoc)
+
+
