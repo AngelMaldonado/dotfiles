@@ -9,5 +9,11 @@
         "plaintext": false,
         "markdown": true,
         "scminput": false
-    }
+    },
+    "window.zoomLevel": 1,
+    "file.associations": {
+        "*.pl": "prolog"
+    },
+    "git.openRepositoryInParentFolders": "always",
+    "editor.lineNumbers": "relative"
 }
