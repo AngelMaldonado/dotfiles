@@ -1,0 +1,13 @@
+{
+    "$schema": "https://aka.ms/winget-settings.schema.json",
+    "installBehavior": {
+        "preferences": {
+            "scope": "machine",
+            "locale": [
+                "es-MX",
+                "en-US"
+            ]
+        },
+        "defaultInstallRoot": "D:/Dev/Tools"
+    }
+}
