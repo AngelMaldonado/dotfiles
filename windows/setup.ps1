@@ -1,65 +1,45 @@
 <#
 .SYNOPSIS
-    Script to install software in the dotfiles directory.
+   Sets up environment and installs software from subdirectories.
 
 .DESCRIPTION
-    This script iterates through each subdirectory in the dotfiles directory
-    and executes any install.ps1 scripts found within those directories.
+    This script sets up the environment and installs software from subdirectories using their respective install.ps1 scripts found in each subdirectory.
 
 .NOTES
     Author: Angel Maldonado
-    Date: 2024-06-26
-    Version: 1.0
+    Date: 2024-06-28
+    Version: 2.0
     License: MIT
-
 #>
 
-# Enable strict mode
-Set-StrictMode -Version Latest
+# Constants for output colors
+$Color_Success = "Green"
+$Color_Error = "Red"
+$Color_Warning = "Yellow"
 
-# Define the base directory where the install scripts are located
-$baseDir = "$PSScriptRoot"
-
-# Define variables for each subdirectory
-$vsCodeDir = Join-Path -Path $baseDir -ChildPath "vscode"
-$gitDir = Join-Path -Path $baseDir -ChildPath "git"
-$nodeDir = Join-Path -Path $baseDir -ChildPath "node"
-# Add more directories as needed
-
-# List of directories to process (comment out to skip)
-$directoriesToProcess = @(
-    $vsCodeDir,
-    $gitDir,
-    $nodeDir
-    # Add or comment out directories as needed
-)
-
-# Function to execute install.ps1 in each specified directory
-function Install-AllSoftware {
-    param (
-        [string[]]$Directories
+# Function to display colored output
+function Write-Log {
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$Message,
+        [Parameter()]
+        [string]$Color = "White"
     )
-    
-    foreach ($dir in $Directories) {
-        $installScript = Join-Path -Path $dir -ChildPath "install.ps1"
-        
-        if (Test-Path -Path $installScript) {
-            Write-Host "Executing $installScript in $($dir)..."
-            try {
-                & $installScript
-                Write-Host "Successfully executed $installScript"
-            } catch {
-                Write-Error "Failed to execute $installScript"
-            }
-        } else {
-            Write-Warning "No install.ps1 script found in $($dir). Skipping..."
-        }
-    }
+
+    Write-Host $Message -ForegroundColor $Color
 }
 
-# Main script logic
-Write-Host "Starting installation of all selected software..."
+# Define subdirectories to install from (folder names)
+$subdirectories = @("vscode", "powershell")  # Add more as needed
 
-Install-AllSoftware -Directories $directoriesToProcess
+# Iterate through each subdirectory and execute install.ps1 if present
+foreach ($subdir in $subdirectories) {
+    $installScript = Join-Path -Path $PSScriptRoot -ChildPath "$subdir\install.ps1"
 
-Write-Host "All selected installations completed."
+    if (Test-Path $installScript) {
+        Write-Log "Executing setup for $subdir..." -Color $Color_Warning
+        & $installScript
+    } else {
+        Write-Log "Install script for $subdir not found." -Color $Color_Error
+    }
+}
