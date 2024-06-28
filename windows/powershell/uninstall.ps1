@@ -1,113 +1,105 @@
 <#
 .SYNOPSIS
-    Script to uninstall PowerShell, Windows Terminal, and Oh My Posh.
+   Uninstalls PowerShell 7, Windows Terminal, Oh My Posh, and Terminal-Icons. Removes configuration files and symlinks.
 
 .DESCRIPTION
-    This script uninstalls PowerShell, Windows Terminal, and Oh My Posh.
-    It also removes symlinks for the settings.json file of Windows Terminal and
-    the PowerShell profile, along with their parent directories.
+    This script uninstalls PowerShell 7, Windows Terminal, Oh My Posh, and Terminal-Icons. It also removes necessary symlinks and configuration files.
 
 .NOTES
     Author: Angel Maldonado
-    Date: 2024-06-27
+    Date: 2024-06-28
     Version: 1.0
     License: MIT
-
 #>
 
-# Enable strict mode
-Set-StrictMode -Version Latest
+# Constants for output colors
+$Color_Success = "Green"
+$Color_Error = "Red"
+$Color_Warning = "Yellow"
 
-# Function to display progress bar
-function Show-ProgressBar {
-    param (
-        [int] $Progress,
-        [int] $Total,
-        [string] $Message
+# Function to display colored output
+function Write-Log {
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$Message,
+        [Parameter()]
+        [string]$Color = "White"
     )
 
-    $ProgressBarWidth = 50
-    $Completed = [math]::Round(($Progress / $Total) * $ProgressBarWidth)
-    $Remaining = $ProgressBarWidth - $Completed
-    $ProgressBar = '[' + ('=' * $Completed) + (' ' * $Remaining) + ']'
-    
-    Write-Progress -Activity $Message -Status $ProgressBar -PercentComplete (($Progress / $Total) * 100)
+    Write-Host $Message -ForegroundColor $Color
 }
 
-# Function to uninstall software using winget
-function Uninstall-Software {
-    param (
-        [string]$Id,
-        [string]$Name
+# Define installation directories
+if ($PSScriptRoot -like "*\windows") {
+    $powershellInstallDir = Join-Path -Path $PSScriptRoot -ChildPath "powershell"
+} else {
+    $powershellInstallDir = $PSScriptRoot
+}
+
+# Function to remove a symbolic link or file
+function Remove-SymbolicLink {
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$LinkPath
     )
 
-    try {
-        $softwareInstalled = @(winget list -e | Where-Object { $_ -like "*$Id*" }).Count -gt 0
+    if (Test-Path $LinkPath) {
+        Remove-Item $LinkPath -Force
+        Write-Log "Removed symbolic link or file at $LinkPath" -Color $Color_Success
+    } else {
+        Write-Log "Symbolic link or file at $LinkPath does not exist" -Color $Color_Warning
+    }
+}
 
-        if ($softwareInstalled) {
-            Write-Host "Uninstalling $Name..."
+# Function to uninstall a package using winget
+function Uninstall-Package {
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$PackageName
+    )
 
-            # Get total number of steps for progress tracking
-            $totalSteps = 100
-            $currentStep = 0
+    $installedApps = winget list
+    $packageInstalled = $installedApps -match $PackageName
 
-            # Uninstall software using winget
-            winget uninstall --id $Id -e | ForEach-Object {
-                $currentStep++
-                $progressPercent = [math]::Round(($currentStep / $totalSteps) * 100)
-                Show-ProgressBar -Progress $progressPercent -Total 100 -Message "Uninstalling $Name"
-            }
+    if ($packageInstalled) {
+        Write-Log "Uninstalling $PackageName..." -Color $Color_Warning
 
-            Write-Host "$Name has been uninstalled successfully."
-        } else {
-            Write-Host "$Name is not installed."
+        try {
+            winget uninstall $PackageName -e
+            Write-Log "$PackageName has been successfully uninstalled." -Color $Color_Success
+        } catch {
+            Write-Log "Failed to uninstall $PackageName." -Color $Color_Error
+            Write-Log $_.Exception.Message -Color $Color_Error
         }
-    } catch {
-        Write-Error "Failed to uninstall $Name"
-        exit 1
+    } else {
+        Write-Log "$PackageName is not installed." -Color $Color_Success
     }
 }
 
-# Main script logic
+# Paths for symbolic links
+$windowsTerminalSettings = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
+$powershellProfile = "$env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
 
+# Remove symbolic links and configuration files
+Remove-SymbolicLink -LinkPath $windowsTerminalSettings
+Remove-SymbolicLink -LinkPath $powershellProfile
+
+# Uninstall Terminal-Icons module
 try {
-    # Uninstall PowerShell 7
-    #Uninstall-Software -Id "Microsoft.PowerShell" -Name "PowerShell 7"
-
-    # Uninstall Windows Terminal
-    Uninstall-Software -Id "Microsoft.WindowsTerminal" -Name "Windows Terminal"
-
-    # Uninstall Oh My Posh
-    Uninstall-Software -Id "JanDeDobbeleer.OhMyPosh" -Name "Oh My Posh"
-
-    # Define paths for settings.json and PowerShell profile
-    $settingsJsonTarget = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
-    $profileTarget = "$env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
-
-    # Remove symlink for Windows Terminal settings.json and its parent directory if empty
-    if (Test-Path -Path $settingsJsonTarget) {
-        Remove-Item -Path $settingsJsonTarget -Force
-        Write-Host "Symlink for Windows Terminal settings.json removed."
-    }
-    $settingsJsonParentDir = Split-Path -Parent $settingsJsonTarget
-    if ((Get-ChildItem -Path $settingsJsonParentDir).Count -eq 0) {
-        Remove-Item -Path $settingsJsonParentDir -Force
-        Write-Host "Parent directory of settings.json removed."
-    }
-
-    # Remove symlink for PowerShell profile and its parent directory if empty
-    if (Test-Path -Path $profileTarget) {
-        Remove-Item -Path $profileTarget -Force
-        Write-Host "Symlink for PowerShell profile removed."
-    }
-    $profileParentDir = Split-Path -Parent $profileTarget
-    if ((Get-ChildItem -Path $profileParentDir).Count -eq 0) {
-        Remove-Item -Path $profileParentDir -Force
-        Write-Host "Parent directory of PowerShell profile removed."
-    }
-
-    Write-Host "Uninstallation process completed successfully."
+    Uninstall-Module -Name Terminal-Icons -AllVersions -Force -ErrorAction Stop
+    Write-Log "Terminal-Icons module has been successfully uninstalled." -Color $Color_Success
 } catch {
-    Write-Error "Failed during uninstallation process: $_"
-    exit 1
+    Write-Log "Failed to uninstall Terminal-Icons module or it was not installed." -Color $Color_Warning
+    Write-Log $_.Exception.Message -Color $Color_Error
 }
+
+# Uninstall Oh My Posh
+Uninstall-Package "JanDeDobbeleer.OhMyPosh"
+
+# Uninstall Windows Terminal
+Uninstall-Package "Microsoft.WindowsTerminal"
+
+# Uninstall PowerShell 7
+Uninstall-Package "Microsoft.PowerShell"
+
+Write-Log "PowerShell uninstallation and cleanup completed." -Color $Color_Success

@@ -1,91 +1,121 @@
 <#
 .SYNOPSIS
-    Script to install and configure PowerShell7, Windows Terminal, and Oh My Posh.
+   Installs PowerShell 7, Windows Terminal, Oh My Posh, and Terminal-Icons. Configures settings.
 
 .DESCRIPTION
-    This script installs PowerShell7, Windows Terminal, and Oh My Posh using winget,
-    then creates symlinks for the Windows Terminal settings.json file and the PowerShell profile.
+    This script installs PowerShell 7, Windows Terminal, Oh My Posh, and Terminal-Icons. It also creates necessary symlinks for configuration files.
 
 .NOTES
     Author: Angel Maldonado
-    Date: 2024-06-26
+    Date: 2024-06-28
     Version: 1.0
     License: MIT
-
 #>
 
-# Function to display progress bar
-function Show-ProgressBar {
-    param (
-        [int] $Progress,
-        [int] $Total,
-        [string] $Message
+# Constants for output colors
+$Color_Success = "Green"
+$Color_Error = "Red"
+$Color_Warning = "Yellow"
+
+# Function to display colored output
+function Write-Log {
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$Message,
+        [Parameter()]
+        [string]$Color = "White"
     )
 
-    $ProgressBarWidth = 50
-    $Completed = [math]::Round(($Progress / $Total) * $ProgressBarWidth)
-    $Remaining = $ProgressBarWidth - $Completed
-    $ProgressBar = '[' + ('=' * $Completed) + (' ' * $Remaining) + ']'
-    
-    Write-Progress -Activity $Message -Status $ProgressBar -PercentComplete (($Progress / $Total) * 100)
+    Write-Host $Message -ForegroundColor $Color
 }
 
-# Install PowerShell7
-$pwshInstalled = @(winget list -e | Where-Object { $_ -like '*Microsoft.Powershell*' }).Count -gt 0
-if (-not $pwshInstalled) {
-    Write-Host "PowerShell7 is not installed. Installing now..."
-    winget install --id Microsoft.Powershell --source winget | ForEach-Object {
-        $Progress++
-        Show-ProgressBar -Progress $Progress -Total $Total -Message "Installing PowerShell7"
-    }
-    Write-Host "PowerShell7 has been installed successfully."
+# Define installation directories
+if ($PSScriptRoot -like "*\windows") {
+    $powershellInstallDir = Join-Path -Path $PSScriptRoot -ChildPath "powershell"
 } else {
-    Write-Host "PowerShell7 is already installed."
+    $powershellInstallDir = $PSScriptRoot
 }
+
+# Function to create a symbolic link
+function Create-SymbolicLink {
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$TargetPath,
+        [Parameter(Mandatory=$true)]
+        [string]$LinkPath
+    )
+
+    if (Test-Path $LinkPath) {
+        Remove-Item $LinkPath -Force
+    }
+
+    New-Item -ItemType SymbolicLink -Path $LinkPath -Target $TargetPath
+    Write-Log "Created symbolic link from $LinkPath to $TargetPath" -Color $Color_Success
+}
+
+# Function to install a package using winget
+function Install-Package {
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$PackageName
+    )
+
+    $installedApps = winget list
+    $packageInstalled = $installedApps -match $PackageName
+
+    if ($packageInstalled) {
+        Write-Log "$PackageName is already installed." -Color $Color_Success
+    } else {
+        Write-Log "Installing $PackageName..." -Color $Color_Warning
+
+        try {
+            winget install $PackageName -e
+            Write-Log "$PackageName has been successfully installed." -Color $Color_Success
+        } catch {
+            Write-Log "Failed to install $PackageName." -Color $Color_Error
+            Write-Log $_.Exception.Message -Color $Color_Error
+        }
+    }
+}
+
+# Install PowerShell 7
+Install-Package "Microsoft.PowerShell"
 
 # Install Windows Terminal
-$terminalInstalled = @(winget list -e | Where-Object { $_ -like '*Microsoft.WindowsTerminal*' }).Count -gt 0
-if (-not $terminalInstalled) {
-    Write-Host "Windows Terminal is not installed. Installing now..."
-    winget install -e --id Microsoft.WindowsTerminal | ForEach-Object {
-        $Progress++
-        Show-ProgressBar -Progress $Progress -Total $Total -Message "Installing Windows Terminal"
-    }
-    Write-Host "Windows Terminal has been installed successfully."
-} else {
-    Write-Host "Windows Terminal is already installed."
-}
+Install-Package "Microsoft.WindowsTerminal"
 
 # Install Oh My Posh
-$ohMyPoshInstalled = @(winget list -e | Where-Object { $_ -like '*JanDeDobbeleer.OhMyPosh*' }).Count -gt 0
-if (-not $ohMyPoshInstalled) {
-    Write-Host "Oh My Posh is not installed. Installing now..."
-    winget install JanDeDobbeleer.OhMyPosh -s winget | ForEach-Object {
-        $Progress++
-        Show-ProgressBar -Progress $Progress -Total $Total -Message "Installing Oh My Posh"
-    }
-    Write-Host "Oh My Posh has been installed successfully."
+Install-Package "JanDeDobbeleer.OhMyPosh"
+
+# Install Terminal-Icons module
+try {
+    Install-Module -Name Terminal-Icons -Scope CurrentUser -Force -ErrorAction Stop
+    Write-Log "Terminal-Icons module has been successfully installed." -Color $Color_Success
+} catch {
+    Write-Log "Failed to install Terminal-Icons module." -Color $Color_Error
+    Write-Log $_.Exception.Message -Color $Color_Error
+}
+
+# Create symlinks for settings
+$windowsTerminalSettings = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
+$powershellProfile = "$env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
+
+# Ensure the PowerShell profile directory exists
+$profileDirectory = [System.IO.Path]::GetDirectoryName($powershellProfile)
+if (!(Test-Path -Path $profileDirectory)) {
+    New-Item -ItemType Directory -Path $profileDirectory -Force
+}
+
+# Validate execution directory and set correct paths
+if ($PSScriptRoot -like "*\windows") {
+    $settingsJsonPath = Join-Path -Path $powershellInstallDir -ChildPath "settings.json"
+    $profilePs1Path = Join-Path -Path $powershellInstallDir -ChildPath "Microsoft.PowerShell_profile.ps1"
 } else {
-    Write-Host "Oh My Posh is already installed."
+    $settingsJsonPath = Join-Path -Path $PSScriptRoot -ChildPath "settings.json"
+    $profilePs1Path = Join-Path -Path $PSScriptRoot -ChildPath "Microsoft.PowerShell_profile.ps1"
 }
 
-# Install Termina-Icons module
-Install-Module -Name Terminal-Icons -Repository PSGallery
+Create-SymbolicLink -TargetPath $settingsJsonPath -LinkPath $windowsTerminalSettings
+Create-SymbolicLink -TargetPath $profilePs1Path -LinkPath $powershellProfile
 
-# Create symlink for Windows Terminal settings.json
-$sourceSettings = "$PSScriptRoot\settings.json"
-$targetSettings = [System.IO.Path]::Combine($env:LOCALAPPDATA, "Packages", "Microsoft.WindowsTerminal_8wekyb3d8bbwe", "LocalState", "settings.json")
-if (Test-Path $targetSettings) {
-    Remove-Item $targetSettings -Force
-}
-New-Item -ItemType SymbolicLink -Path $targetSettings -Target $sourceSettings
-Write-Host "Symlink for settings.json created successfully."
-
-# Create symlink for PowerShell profile
-$sourceProfile = "$PSScriptRoot\Microsoft.PowerShell_profile.ps1"
-$targetProfile = [System.IO.Path]::Combine($env:USERPROFILE, "Documents", "PowerShell", "Microsoft.PowerShell_profile.ps1")
-if (Test-Path $targetProfile) {
-    Remove-Item $targetProfile -Force
-}
-New-Item -ItemType SymbolicLink -Path $targetProfile -Target $sourceProfile
-Write-Host "Symlink for PowerShell profile created successfully."
+Write-Log "PowerShell setup and configuration completed." -Color $Color_Success
