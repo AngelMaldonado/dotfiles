@@ -79,9 +79,11 @@ function Install-VisualStudioCode {
     # Create symlink for settings.json
     $vscodeSettingsDir = "$env:APPDATA\Code\User"
     $settingsJsonLink = "$vscodeSettingsDir\settings.json"
+    $keybindingsJsonLink = "$vscodeSettingsDir\keybindings.json"
 
     try {
         New-SymbolicLink -TargetPath "$vscodeInstallDir\settings.json" -LinkPath $settingsJsonLink
+        New-SymbolicLink -TargetPath "$vscodeInstallDir\keybindings.json" -LinkPath $keybindingsJsonLink
         Write-Log "Symbolic link for settings.json created successfully." -Color $Color_Success
     } catch {
         Write-Log "Failed to create symbolic link for settings.json." -Color $Color_Error
