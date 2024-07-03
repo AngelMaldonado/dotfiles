@@ -1,3 +1,5 @@
 [user]
 	name = AngelMaldonado
 	email = amaldonadojuarez@gmail.com
+[core]
+	autocrlf = true

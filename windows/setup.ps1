@@ -30,7 +30,7 @@ function Write-Log {
 }
 
 # Define subdirectories to install from (folder names)
-$subdirectories = @("vscode", "powershell")  # Add more as needed
+$subdirectories = @("vscode", "powershell", "git")  # Add more as needed
 
 # Iterate through each subdirectory and execute install.ps1 if present
 foreach ($subdir in $subdirectories) {
