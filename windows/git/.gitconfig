@@ -3,3 +3,7 @@
 	email = amaldonadojuarez@gmail.com
 [core]
 	autocrlf = true
+[diff]
+	tool = vscode
+[difftool "vscode"]
+	cmd = code --wait --diff $LOCAL $REMOTE
