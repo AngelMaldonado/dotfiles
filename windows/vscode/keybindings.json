@@ -53,11 +53,5 @@
         "command": "deleteFile",
         "key": "d",
         "when": "filesExplorerFocus && !inputFocus"
-    },
-    // Window
-    {
-        "key": "shift+n",
-        "command": "workbench.action.newWindow",
-        "when": "!explorerViewletFocus"
     }
 ]
