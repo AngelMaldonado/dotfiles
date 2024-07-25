@@ -12,7 +12,17 @@
     },
     {
         "key": "shift+j",
-        "command": "workbench.action.togglePanel"
+        "command": "workbench.action.terminal.focus"
+    },
+    {
+        "key": "shift+j",
+        "command": "workbench.action.togglePanel",
+        "when": "panelFocus"
+    },
+    {
+        "key": "shift+m",
+        "command": "workbench.action.toggleMaximizedPanel",
+        "when": "panelFocus"
     },
     {
         "key": "shift+n",
@@ -27,12 +37,13 @@
     // File tree
     {
         "command": "workbench.action.toggleSidebarVisibility",
-        "key": "ctrl+e"
+        "key": "q",
+        "when": "filesExplorerFocus && !inputFocus"
     },
     {
         "command": "workbench.files.action.focusFilesExplorer",
-        "key": "ctrl+e",
-        "when": "editorTextFocus"
+        "key": "space e",
+        "when": "!editorTextFocus && !inputFocus"
     },
     {
         "key": "n",
