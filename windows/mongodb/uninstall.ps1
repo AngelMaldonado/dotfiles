@@ -67,5 +67,6 @@ function Uninstall-Package {
 # Uninstall MongoDB
 Uninstall-Package "MongoDB.Server"
 Uninstall-Package "MongoDB.Compass.Community"
+Uninstall-Package "MongoDB.Shell"
 
 Write-Log "MongoDB uninstallation completed." -Color $Color_Success

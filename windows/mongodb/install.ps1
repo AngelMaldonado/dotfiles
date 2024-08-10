@@ -67,5 +67,6 @@ function Install-Package {
 # Install MongoDB
 Install-Package "MongoDB.Server"
 Install-Package "MongoDB.Compass.Community"
+Install-Package "MongoDB.Shell"
 
 Write-Log "MongoDB setup and installation completed." -Color $Color_Success
