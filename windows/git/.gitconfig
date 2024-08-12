@@ -7,3 +7,7 @@
 	tool = vscode
 [difftool "vscode"]
 	cmd = code --wait --diff $LOCAL $REMOTE
+[alias]
+	gl = log --oneline --graph
+	discard = restore .
+	unstage = restore --staged .
