@@ -1,5 +1,11 @@
 [
     /** FILE TREE & LEFT PANEL **/
+    // Open file tree
+    {
+        "key": "space e",
+        "command": "workbench.files.action.focusFilesExplorer",
+        "when": "!filesExplorerFocus && !inputFocus"
+    },
     {
         "command": "workbench.action.toggleSidebarVisibility",
         "key": "q",

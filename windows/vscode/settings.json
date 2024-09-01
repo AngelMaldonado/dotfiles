@@ -1,4 +1,5 @@
 {
+    /** RESET **/
     "editor.minimap.enabled": false,
     "editor.stickyScroll.enabled": false,
     "explorer.compactFolders": false,
@@ -7,12 +8,50 @@
     "workbench.activityBar.location": "hidden",
     "workbench.editor.editorActionsLocation": "hidden",
     "workbench.layoutControl.enabled": false,
+    "workbench.editor.showTabs": "none",
     "window.menuBarVisibility": "compact",
     "window.commandCenter": false,
     "window.zoomLevel": 2,
-    /* Theme */
+    /** Theme & Colors **/
     "workbench.iconTheme": "material-icon-theme",
     "workbench.colorTheme": "Shades of Purple",
+    /** Languages **/
+    "[typescript]": {
+        "editor.defaultFormatter": "vscode.typescript-language-features",
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "vscode.typescript-language-features"
+    },
+    "svelte.enable-ts-plugin": true,
+    "[typescriptreact]": {
+        "editor.defaultFormatter": "vscode.typescript-language-features"
+    },
+    "[json]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "typescript.updateImportsOnFileMove.enabled": "always",
+    /* Extensions */
+    "hediet.vscode-drawio.resizeImages": null,
+    "hediet.vscode-drawio.theme": "automatic",
+    "hediet.vscode-drawio.codeLinkActivated": false,
+    "github.copilot.enable": {
+        "*": true,
+        "plaintext": false,
+        "markdown": true,
+        "scminput": false
+    },
+    "git.openRepositoryInParentFolders": "always",
+    "markdown-pdf.displayHeaderFooter": false,
+    "files.associations": {
+        ".env*": "dotenv"
+    },
+    "dotenv.enableAutocloaking": false,
+    "gitlens.launchpad.indicator.enabled": false,
+    "emmet.preferences": {
+        "output.inlineBreak": 1
+    },
+    /* Terminal */
+    "terminal.integrated.fontFamily": "FiraCode Nerd Font Mono",
     /* Editor */
     "editor.inlineSuggest.enabled": true,
     "editor.lineNumbers": "relative",
@@ -49,65 +88,5 @@
         { "before": ["<S-j>"], "commands": ["editor.action.moveLinesDownAction"] },
         { "before": ["<S-k>"], "commands": ["editor.action.moveLinesUpAction"] },
         { "before": ["<C-n>"], "commands": ["editor.action.addSelectionToNextFindMatch"] }
-    ],
-    /* Terminal */
-    "terminal.integrated.fontFamily": "FiraCode Nerd Font Mono",
-    /* Extensions */
-    "hediet.vscode-drawio.resizeImages": null,
-    "hediet.vscode-drawio.theme": "automatic",
-    "hediet.vscode-drawio.codeLinkActivated": false,
-    "github.copilot.enable": {
-        "*": true,
-        "plaintext": false,
-        "markdown": true,
-        "scminput": false
-    },
-    "git.openRepositoryInParentFolders": "always",
-    "markdown-pdf.displayHeaderFooter": false,
-    "files.associations": {
-        ".env*": "dotenv"
-    },
-    "dotenv.enableAutocloaking": false,
-    "gitlens.launchpad.indicator.enabled": false,
-    "emmet.preferences": {
-        "output.inlineBreak": 1
-    },
-    "editor.tokenColorCustomizations": {
-        "[*Light*]": {
-            "textMateRules": [
-                {
-                    "scope": "ref.matchtext",
-                    "settings": {
-                        "foreground": "#000"
-                    }
-                }
-            ]
-        },
-        "[*Dark*]": {
-            "textMateRules": [
-                {
-                    "scope": "ref.matchtext",
-                    "settings": {
-                        "foreground": "#fff"
-                    }
-                }
-            ]
-        },
-        "textMateRules": []
-    },
-    "[typescript]": {
-        "editor.defaultFormatter": "vscode.typescript-language-features"
-    },
-    "[javascript]": {
-        "editor.defaultFormatter": "vscode.typescript-language-features"
-    },
-    "svelte.enable-ts-plugin": true,
-    "[typescriptreact]": {
-        "editor.defaultFormatter": "vscode.typescript-language-features"
-    },
-    "[json]": {
-        "editor.defaultFormatter": "vscode.json-language-features"
-    },
-    "typescript.updateImportsOnFileMove.enabled": "always",
-    "workbench.editor.showTabs": "none"
+    ]
 }
