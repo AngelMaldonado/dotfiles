@@ -1,5 +1,53 @@
 [
-    // Terminal
+    /** FILE TREE & LEFT PANEL **/
+    {
+        "command": "workbench.action.toggleSidebarVisibility",
+        "key": "q",
+        "when": "sideBarFocus && !inputFocus"
+    },
+    // Rename file or folder
+    {
+        "key": "r",
+        "command": "renameFile",
+        "when": "filesExplorerFocus && foldersViewVisible && !explorerResourceIsRoot && !explorerResourceReadonly && !inputFocus"
+    },
+    // Copy file or folder
+    {
+        "key": "y",
+        "command": "filesExplorer.copy",
+        "when": "filesExplorerFocus && foldersViewVisible && !explorerResourceIsRoot && !explorerResourceReadonly && !inputFocus"
+    },
+    // Cut file or folder
+    {
+        "key": "x",
+        "command": "filesExplorer.cut",
+        "when": "filesExplorerFocus && foldersViewVisible && !explorerResourceIsRoot && !explorerResourceReadonly && !inputFocus"
+    },
+    // Paste file or folder
+    {
+        "key": "p",
+        "command": "filesExplorer.paste",
+        "when": "filesExplorerFocus && foldersViewVisible && !explorerResourceIsRoot && !explorerResourceReadonly && !inputFocus"
+    },
+    // Delete file or folder
+    {
+        "key": "d",
+        "command": "deleteFile",
+        "when": "filesExplorerFocus && foldersViewVisible && !explorerResourceIsRoot && !explorerResourceReadonly && !inputFocus"
+    },
+    // Create file
+    {
+        "key": "n",
+        "command": "explorer.newFile",
+        "when": "filesExplorerFocus && foldersViewVisible && !explorerResourceIsRoot && !explorerResourceReadonly && !inputFocus"
+    },
+    // Create folder
+    {
+        "key": "shift+n",
+        "command": "explorer.newFolder",
+        "when": "filesExplorerFocus && foldersViewVisible && !explorerResourceIsRoot && !explorerResourceReadonly && !inputFocus"
+    },
+    /** TERMINAL **/
     {
         "key": "shift+a",
         "command": "workbench.action.terminal.focusNext",
@@ -12,7 +60,8 @@
     },
     {
         "key": "shift+j",
-        "command": "workbench.action.terminal.focus"
+        "command": "workbench.action.terminal.focus",
+        "when": "vim.mode != 'Visual'"
     },
     {
         "key": "shift+j",
@@ -33,36 +82,5 @@
         "key": "shift+w",
         "command": "workbench.action.terminal.kill",
         "when": "terminalFocus"
-    },
-    // File tree
-    {
-        "command": "workbench.action.toggleSidebarVisibility",
-        "key": "q",
-        "when": "filesExplorerFocus && !inputFocus"
-    },
-    {
-        "command": "workbench.files.action.focusFilesExplorer",
-        "key": "space e",
-        "when": "!editorTextFocus && !inputFocus"
-    },
-    {
-        "key": "n",
-        "command": "explorer.newFile",
-        "when": "filesExplorerFocus && !inputFocus"
-    },
-    {
-        "command": "renameFile",
-        "key": "r",
-        "when": "filesExplorerFocus && !inputFocus"
-    },
-    {
-        "key": "shift+n",
-        "command": "explorer.newFolder",
-        "when": "explorerViewletFocus"
-    },
-    {
-        "command": "deleteFile",
-        "key": "d",
-        "when": "filesExplorerFocus && !inputFocus"
     }
 ]
