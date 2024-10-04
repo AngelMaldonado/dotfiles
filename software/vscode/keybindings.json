@@ -4,12 +4,19 @@
     {
         "key": "space e",
         "command": "workbench.files.action.focusFilesExplorer",
-        "when": "!filesExplorerFocus && !inputFocus"
+        "when": "!inputFocus"
     },
+    // Close file tree
     {
         "command": "workbench.action.toggleSidebarVisibility",
         "key": "q",
         "when": "sideBarFocus && !inputFocus"
+    },
+    // Quick open
+    {
+        "key": "space space",
+        "command": "workbench.action.quickOpen",
+        "when": "!inputFocus"
     },
     // Rename file or folder
     {
@@ -88,5 +95,16 @@
         "key": "shift+w",
         "command": "workbench.action.terminal.kill",
         "when": "terminalFocus"
+    },
+    /** EDITOR **/
+    {
+        "key": "ctrl+k",
+        "command": "selectPrevSuggestion",
+        "when": "suggestWidgetMultipleSuggestions && suggestWidgetVisible && textInputFocus || suggestWidgetVisible && textInputFocus && !suggestWidgetHasFocusedSuggestion"
+    },
+    {
+        "key": "ctrl+j",
+        "command": "-selectPrevSuggestion",
+        "when": "suggestWidgetMultipleSuggestions && suggestWidgetVisible && textInputFocus || suggestWidgetVisible && textInputFocus && !suggestWidgetHasFocusedSuggestion"
     }
 ]
