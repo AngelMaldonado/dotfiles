@@ -1,22 +1,8 @@
 import os
 import importlib
-import subprocess
-import sys
-import signal
 import curses
-
-
-def install_curses():
-    """Install the curses library based on the current platform."""
-    try:
-        if sys.platform.startswith('win'):
-            subprocess.check_call(
-                [sys.executable, '-m', 'pip', 'install', 'windows-curses'])
-        else:
-            print(
-                "Curses library is typically included with Python on Unix-like systems.")
-    except Exception as e:
-        print(f"Failed to install curses library: {e}")
+import signal
+import sys
 
 
 def get_available_software():
@@ -25,28 +11,28 @@ def get_available_software():
     return [name for name in os.listdir(software_dir) if os.path.isdir(os.path.join(software_dir, name))]
 
 
-def install_software(software_name):
-    """Install and configure the selected software."""
+def uninstall_software(software_name):
+    """Uninstall the selected software."""
     try:
-        module = importlib.import_module(f'software.{software_name}.install')
-        if hasattr(module, 'install') and callable(module.install):
-            module.install()
+        module = importlib.import_module(f'software.{software_name}.uninstall')
+        if hasattr(module, 'uninstall') and callable(module.uninstall):
+            module.uninstall()
         else:
-            print(f"No valid install function found for {software_name}.")
+            print(f"No valid uninstall function found for {software_name}.")
     except ModuleNotFoundError:
-        print(f"Error: Could not find installation script for {
+        print(f"Error: Could not find uninstallation script for {
               software_name}.")
 
 
 def handle_sigint(signum, frame):
     """Signal handler for Ctrl+C (SIGINT)."""
     print("\nCtrl+C detected! Exiting gracefully...")
-    curses.endwin()  # Ensure curses exits cleanly
     sys.exit(0)  # Exit the program cleanly
 
 
 def main(stdscr):
-    """Main function to handle user interface and software installation."""
+    """Main function to handle user interface and software uninstallation."""
+    # Set up Ctrl+C signal handler
     signal.signal(signal.SIGINT, handle_sigint)
 
     curses.curs_set(0)  # Hide the cursor
@@ -67,12 +53,12 @@ def main(stdscr):
     while True:
         stdscr.clear()
         stdscr.addstr(
-            0, 0, "Mark the software you want to install/configure (press 'i' to toggle selection, 'Enter' to start installation, 'q' to quit):")
+            0, 0, "Mark the software you want to uninstall (press 'i' to toggle selection, 'Enter' to start uninstallation, 'q' to quit):")
 
         for idx, software in enumerate(available_software):
             mark = "[X]" if selected_software[idx] else "[ ]"
             if idx == current_row:
-                # Highlight selected row
+                # Highlight the selected row
                 stdscr.addstr(
                     idx + 1, 0, f"{mark} {software}", curses.color_pair(1))
             else:
@@ -97,22 +83,16 @@ def main(stdscr):
             if current_row == 0:  # If "All" is selected/deselected
                 for i in range(1, len(selected_software)):
                     selected_software[i] = selected_software[0]
-        elif key in [curses.KEY_ENTER, 10, 13]:  # Enter key
+        elif key == curses.KEY_ENTER or key in [10, 13]:  # Enter key
             break
         elif key == ord('q'):
             return
 
-    # Exit curses before proceeding with installations
-    curses.endwin()
-
-    # Gather selected software for installation
+    # Gather selected software for uninstallation
     for idx, selected in enumerate(selected_software):
-        if selected and idx > 0:  # Skip "All" option in installation
-            print(f"Installing {available_software[idx]}...")
-            install_software(available_software[idx])
-            print(f"{available_software[idx]} installation complete.")
+        if selected and idx > 0:  # Skip "All" option in uninstallation
+            uninstall_software(available_software[idx])
 
 
 if __name__ == "__main__":
-    install_curses()  # Ensure curses is installed for the current platform
     curses.wrapper(main)
