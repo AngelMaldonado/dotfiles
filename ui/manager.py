@@ -1,34 +1,43 @@
-from ui.welcome import Welcome
-from ui.menu import Menu
+from ui.components.menu import Menu
+from ui.components.text import Text
+from ui.renderer import Renderer
 
 
 class UIManager:
     def __init__(self, stdscr):
-        self.stdscr = stdscr
-        self.welcome = Welcome(stdscr)
-        self.menu = Menu(stdscr)
-        self.current_row = 0
+        self.renderer = Renderer(stdscr)
 
-    def display(self):
-        """Handles rendering of all UI components (welcome, menu, instructions)."""
-        self.stdscr.clear()
+    def run(self):
+        # Create a menu
+        menu_options = [
+            {'label': 'Select Software', 'selected': False},
+            {'label': 'Install All', 'selected': False},
+            {'label': 'Remove Software', 'selected': False},
+            {'label': 'Clean All', 'selected': False}
+        ]
+        menu = Menu(menu_options, x=10, y=5)
 
-        # Display welcome message
-        self.welcome.display()
+        # Create a welcome text
+        welcome_text = Text("Welcome to the Developer Tool", x=10, y=3)
 
-        # Display menu options
-        self.menu.display(self.current_row)
+        # Add drawable elements to the handler
+        self.renderer.add(welcome_text)
+        self.renderer.add(menu)
 
-        # Display navigation instructions at the bottom
-        height, width = self.stdscr.getmaxyx()
-        instructions = "Use j/k to move, Enter to select, q to quit"
-        self.stdscr.addstr(height - 2, width // 2 -
-                           len(instructions) // 2, instructions)
+        # Main loop for rendering and input handling
+        while True:
+            # Render the UI first
+            self.renderer.render()
 
-        # Refresh the screen
-        self.stdscr.refresh()
+            # Get user input
+            key = self.renderer.stdscr.getch()
 
-    def handle_keypress(self, key):
-        """Handles keypress input for Vim-like navigation and quitting."""
-        self.current_row = self.menu.handle_input(key, self.current_row)
-        return self.menu.should_exit(key, self.current_row)
+            # Handle input for the menu
+            menu.handle_input(key)
+
+            # Render the UI again after input handling to reflect changes
+            self.renderer.render()
+
+            # Quit on 'q' key
+            if key == ord('q'):
+                break
