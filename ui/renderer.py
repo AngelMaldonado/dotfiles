@@ -1,14 +1,10 @@
-import curses
-from ui.colors import ColorChannels
+import os
 from ui.drawable import Drawable
 
 
 class Renderer:
-    def __init__(self, stdscr):
-        self.stdscr = stdscr
+    def __init__(self):
         self.drawables = []
-        curses.curs_set(0)
-        ColorChannels.initialize_colors()
 
     def add(self, drawable):
         """Add a drawable element to be rendered."""
@@ -18,12 +14,14 @@ class Renderer:
             raise ValueError(
                 "Drawable object must be an instance of Drawable class.")
 
+    def clear_screen(self):
+        os.system('cls' if os.name == 'nt' else 'clear')
+
     def render(self):
         """Render all drawable elements."""
-        self.stdscr.clear()
+        self.clear_screen()
         for drawable in self.drawables:
-            drawable.draw(self.stdscr)
-        self.stdscr.refresh()
+            drawable.draw()
 
     def clear(self):
         """Clear the list of drawables."""

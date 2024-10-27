@@ -1,11 +1,13 @@
-from ui.components.menu import Menu
-from ui.components.text import Text
+import sys
+import termios
+import tty
+from ui.menu import Menu
 from ui.renderer import Renderer
 
 
 class UIManager:
-    def __init__(self, stdscr):
-        self.renderer = Renderer(stdscr)
+    def __init__(self):
+        self.renderer = Renderer()
 
     def run(self):
         # Create a menu
@@ -15,13 +17,9 @@ class UIManager:
             {'label': 'Remove Software', 'selected': False},
             {'label': 'Clean All', 'selected': False}
         ]
-        menu = Menu(menu_options, x=10, y=5)
-
-        # Create a welcome text
-        welcome_text = Text("Welcome to the Developer Tool", x=10, y=3)
+        menu = Menu(menu_options)
 
         # Add drawable elements to the handler
-        self.renderer.add(welcome_text)
         self.renderer.add(menu)
 
         # Main loop for rendering and input handling
@@ -30,14 +28,22 @@ class UIManager:
             self.renderer.render()
 
             # Get user input
-            key = self.renderer.stdscr.getch()
+            key = self.get_keypress()
 
             # Handle input for the menu
             menu.handle_input(key)
 
-            # Render the UI again after input handling to reflect changes
-            self.renderer.render()
-
             # Quit on 'q' key
             if key == ord('q'):
                 break
+
+    def get_keypress(self):
+        # Capture single keypress
+        fd = sys.stdin.fileno()
+        old_settings = termios.tcgetattr(fd)
+        try:
+            tty.setraw(sys.stdin.fileno())
+            key = sys.stdin.read(1)
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+        return key
